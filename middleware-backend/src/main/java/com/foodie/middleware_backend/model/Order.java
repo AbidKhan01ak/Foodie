@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -14,11 +16,22 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "customer_id")
     private Long customerId;
+
+    @Column(name = "restaurant_id")
     private Long restaurantId;
+
+    @Column(name = "driver_id")
     private Long driverId;
 
-    private String items; // Simplified for now
+    @ElementCollection
+    @CollectionTable(
+            name = "order_items",
+            joinColumns = @JoinColumn(name = "order_id")
+    )
+    @Column(name = "item")
+    private List<String> items; // Simplified for now
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
@@ -27,7 +40,6 @@ public class Order {
 
     public Order() {
         this.createdAt = LocalDateTime.now();
-        this.status = OrderStatus.PLACED;
     }
 
     public Long getId() {
@@ -62,11 +74,11 @@ public class Order {
         this.driverId = driverId;
     }
 
-    public String getItems() {
+    public List<String> getItems() {
         return items;
     }
 
-    public void setItems(String items) {
+    public void setItems(List<String> items) {
         this.items = items;
     }
 

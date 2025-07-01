@@ -5,7 +5,7 @@ import com.foodie.middleware_backend.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api/customers")
 public class CustomerController {
 
     private final OrderService orderService;
@@ -14,12 +14,12 @@ public class CustomerController {
         this.orderService = orderService;
     }
 
-    @PostMapping
+    @PostMapping("/order")
     public Order placeOrder(@RequestBody Order order) {
         return orderService.createOrder(order);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/track/{id}")
     public Order trackOrder(@PathVariable Long id) {
         return orderService.getOrder(id);
     }
