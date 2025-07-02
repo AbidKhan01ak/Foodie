@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import api from "@/api";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -44,38 +44,25 @@ const TrackOrder = () => {
 
   const fetchOrderStatus = async (id: string) => {
     try {
-      // Replace with actual API call
-      // const response = await axios.get(`/api/orders/${id}/status`);
-      // setOrderStatus(response.data);
-
-      // Mock data with random status progression
-      const statuses: OrderStatus["status"][] = [
-        "placed",
-        "confirmed",
-        "preparing",
-        "ready_for_pickup",
-        "out_for_delivery",
-        "delivered",
-      ];
-      const currentTime = new Date();
-      const randomIndex = Math.floor(Math.random() * statuses.length);
-
-      const mockOrder: OrderStatus = {
-        id: id,
-        status: statuses[randomIndex],
+      const response = await api.get(`/customers/track/${id}`);
+      const data = response.data;
+      const mappedOrder: OrderStatus = {
+        id: data.id.toString(),
+        status: data.status.toLowerCase(), // Assuming enum like DELIVERED, map to lowercase
         estimatedDeliveryTime: new Date(
-          currentTime.getTime() + 30 * 60000
+          data.estimatedDeliveryTime
         ).toLocaleTimeString(),
-        items: [
-          { name: "Margherita Pizza", quantity: 1, price: 16.99 },
-          { name: "Caesar Salad", quantity: 1, price: 12.99 },
-        ],
-        totalAmount: 32.97,
-        deliveryAddress: "123 Main St, New York, NY",
-        restaurantName: "Mario's Pizzeria",
+        items: data.items.map((item: any) => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        totalAmount: data.totalAmount,
+        deliveryAddress: data.deliveryAddress,
+        restaurantName: data.restaurant.name, // Assuming nested restaurant object
       };
 
-      setOrderStatus(mockOrder);
+      setOrderStatus(mappedOrder);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching order status:", error);

@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "@/api";
 
 const Cart = () => {
   const { items, updateQuantity, removeItem, getTotalPrice, clearCart } =
@@ -19,28 +18,13 @@ const Cart = () => {
       setLoading(true);
 
       const orderData = {
-        items: items.map((item) => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          restaurantId: item.restaurantId,
-        })),
-        totalAmount: getTotalPrice(),
-        deliveryAddress: "123 Main St", // In a real app, this would come from user input
-        customerInfo: {
-          name: "John Doe",
-          phone: "+1234567890",
-          email: "john@example.com",
-        },
+        customerId: 1, // TODO: Replace with dynamic customer ID
+        restaurantId: items[0].restaurantId,
+        items: items.map((item) => item.name), // only names expected by backend
       };
 
-      // Replace with actual API call
-      // const response = await axios.post('/api/orders', orderData);
-      // const orderId = response.data.id;
-
-      // Mock API response
-      const orderId = Date.now().toString();
+      const response = await api.post("/customers/order", orderData);
+      const orderId = response.data.id;
 
       clearCart();
       navigate(`/track-order/${orderId}`);
